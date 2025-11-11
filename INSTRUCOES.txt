@@ -1,0 +1,136 @@
+========================================
+INSTRUÇÕES DE INSTALAÇÃO NO INFINITYFREE
+========================================
+
+1. CRIAR CONTA NO INFINITYFREE
+   - Acesse: https://infinityfree.net
+   - Crie uma conta gratuita
+   - Crie um novo site
+
+2. CONFIGURAR O BANCO DE DADOS
+   - No painel de controle, vá em "MySQL Databases"
+   - Anote as informações:
+     * Nome do servidor MySQL (ex: sql123.infinityfree.com) sql213.infinityfree.com
+     * Nome de usuário (ex: epiz_12345678) if0_40161697
+     * Senha
+     * Nome do banco de dados (ex: epiz_12345678_meusite)  if0_40161697_Banco
+
+3. ATUALIZAR O ARQUIVO config/database.php
+   - Abra o arquivo config/database.php
+   - Substitua os valores:
+     * DB_SERVER com seu servidor MySQL
+     * DB_USERNAME com seu usuário
+     * DB_PASSWORD com sua senha
+     * DB_NAME com nome do banco de dados
+
+4. CRIAR AS TABELAS NO BANCO DE DADOS
+   - No painel InfinityFree, clique em "phpMyAdmin"
+   - Faça login com suas credenciais
+   - Selecione seu banco de dados no menu lateral
+   - Clique na aba "SQL"
+   - Copie TODO o conteúdo do arquivo scripts/criar_tabelas.sql
+   - Cole na área de texto e clique em "Go" ou "Executar"
+
+5. FAZER UPLOAD DOS ARQUIVOS
+   Opção A - FTP (Recomendado):
+   - Use FileZilla ou outro cliente FTP
+   - Conecte usando as credenciais FTP do painel
+   - Envie TODOS os arquivos para a pasta /htdocs/
+   
+   Opção B - File Manager:
+   - No painel, vá em "Online File Manager"
+   - Navegue até /htdocs/
+   - Faça upload dos arquivos
+
+6. ESTRUTURA DE ARQUIVOS NO SERVIDOR
+   /htdocs/
+   ├── config/
+   │   └── database.php
+   ├── assets/
+   │   └── style.css
+   ├── index.php
+   ├── usuarios.php
+   ├── cadastro.php
+   └── post.php
+
+7. TESTAR O SITE
+   - Acesse: seu-dominio.infinityfree.net
+   - Verifique se o site carrega corretamente
+   - Teste o cadastro de usuários
+   - Verifique a listagem de usuários
+
+========================================
+COMANDOS SQL PARA PHPMYADMIN
+========================================
+
+Os comandos SQL estão no arquivo: scripts/criar_tabelas.sql
+
+Este arquivo cria 3 tabelas:
+1. usuarios - Para armazenar usuários do sistema
+2. posts - Para armazenar artigos/publicações
+3. comentarios - Para comentários nos posts
+
+Também insere dados de exemplo para teste.
+
+========================================
+ESTRUTURA DO BANCO DE DADOS
+========================================
+
+TABELA: usuarios
+- id (INT, AUTO_INCREMENT, PRIMARY KEY)
+- nome (VARCHAR 100, NOT NULL)
+- email (VARCHAR 100, NOT NULL, UNIQUE)
+- telefone (VARCHAR 20)
+- data_cadastro (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+- ativo (TINYINT 1, DEFAULT 1)
+
+TABELA: posts
+- id (INT, AUTO_INCREMENT, PRIMARY KEY)
+- titulo (VARCHAR 200, NOT NULL)
+- conteudo (TEXT, NOT NULL)
+- autor_id (INT, FOREIGN KEY → usuarios.id)
+- data_publicacao (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+- visualizacoes (INT, DEFAULT 0)
+- status (ENUM: rascunho, publicado, arquivado)
+
+TABELA: comentarios
+- id (INT, AUTO_INCREMENT, PRIMARY KEY)
+- post_id (INT, FOREIGN KEY → posts.id)
+- usuario_id (INT, FOREIGN KEY → usuarios.id)
+- comentario (TEXT, NOT NULL)
+- data_comentario (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+- aprovado (TINYINT 1, DEFAULT 0)
+
+========================================
+DICAS IMPORTANTES
+========================================
+
+1. SEGURANÇA:
+   - Nunca compartilhe suas credenciais de banco de dados
+   - Use prepared statements (já implementado)
+   - Sempre sanitize inputs (já implementado)
+
+2. LIMITAÇÕES DO INFINITYFREE:
+   - Limite de hits por hora
+   - Pode haver suspensão temporária por inatividade
+   - Sem suporte a envio de emails (use SMTP externo)
+
+3. TROUBLESHOOTING:
+   - Se o site não carregar, verifique o arquivo .htaccess
+   - Erros de conexão: verifique config/database.php
+   - Tabelas não criadas: re-execute o SQL no phpMyAdmin
+
+4. MELHORIAS FUTURAS:
+   - Adicionar sistema de login
+   - Implementar upload de imagens
+   - Criar painel administrativo
+   - Adicionar paginação
+   - Implementar busca
+
+========================================
+SUPORTE
+========================================
+
+Documentação InfinityFree: https://forum.infinityfree.net
+Documentação PHP: https://www.php.net/docs.php
+Documentação MySQL: https://dev.mysql.com/doc/
