@@ -126,6 +126,71 @@ main {
   margin: 2rem 0;
 }
 
+/* Estilos para sistema de comentários */
+.comentarios-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.comentarios-section h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.form-comentario {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.form-comentario h4 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.comentarios-lista {
+  margin-top: 2rem;
+}
+
+.comentario-item {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 3px solid #3498db;
+}
+
+.comentario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.comentario-header strong {
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.comentario-data {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+}
+
+.comentario-conteudo {
+  color: #555;
+  line-height: 1.6;
+}
+
 /* Table */
 .table-container {
   background: white;
@@ -173,6 +238,19 @@ tr:hover {
   color: #2c3e50;
 }
 
+/* estilos para o formulário de cadastro de posts */
+.form-cadastro {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-cadastro h2 {
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -184,17 +262,27 @@ tr:hover {
   font-weight: bold;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 1rem;
+  font-family: Arial, sans-serif;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
   border-color: #3498db;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 150px;
 }
 
 /* Buttons */
@@ -209,6 +297,7 @@ tr:hover {
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 1rem;
+  margin-right: 1rem;
 }
 
 .btn:hover {
@@ -221,6 +310,24 @@ tr:hover {
 
 .btn-primary:hover {
   background-color: #229954;
+}
+
+/* botão secundário para cancelar/voltar */
+.btn-secondary {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #95a5a6;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 1rem;
+}
+
+.btn-secondary:hover {
+  background-color: #7f8c8d;
 }
 
 /* Mensagens */
@@ -275,5 +382,12 @@ footer {
   th,
   td {
     padding: 0.5rem;
+  }
+
+  /* Melhorias no menu de navegação para acomodar logout */
+  .comentario-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }

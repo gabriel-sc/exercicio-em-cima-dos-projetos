@@ -5,39 +5,72 @@ $mensagem = '';
 $tipo_mensagem = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $conn = conectarBanco();
-    
-    $nome = $conn->real_escape_string($_POST['nome']);
-    $email = $conn->real_escape_string($_POST['email']);
-    $telefone = $conn->real_escape_string($_POST['telefone']);
-    
-    // Verificar se o email já existe
-    $verifica = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
-    $verifica->bind_param("s", $email);
-    $verifica->execute();
-    $resultado = $verifica->get_result();
-    
-    if ($resultado->num_rows > 0) {
-        $mensagem = 'Este email já está cadastrado!';
-        $tipo_mensagem = 'erro';
-    } else {
-        // Inserir novo usuário
-        $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, telefone) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $nome, $email, $telefone);
+    try {
+        $conn = conectarBanco();
+        verificarTabelas($conn);
         
-        if ($stmt->execute()) {
-            $mensagem = 'Usuário cadastrado com sucesso!';
-            $tipo_mensagem = 'sucesso';
-        } else {
-            $mensagem = 'Erro ao cadastrar usuário: ' . $conn->error;
-            $tipo_mensagem = 'erro';
+        $nome = trim($_POST['nome']);
+        $email = trim($_POST['email']);
+        $telefone = trim($_POST['telefone']);
+        $senha = $_POST['senha'];
+        $confirma_senha = $_POST['confirma_senha'];
+        
+        // Validações básicas
+        if (empty($nome)) {
+            throw new Exception('Nome é obrigatório');
         }
         
-        $stmt->close();
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Email inválido');
+        }
+        
+        if (empty($senha) || strlen($senha) < 6) {
+            throw new Exception('A senha deve ter pelo menos 6 caracteres');
+        }
+        
+        if ($senha !== $confirma_senha) {
+            throw new Exception('As senhas não coincidem');
+        }
+        
+        // Verificar se o email já existe
+        $verifica = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+        if (!$verifica) {
+            throw new Exception('Erro ao preparar consulta: ' . $conn->error);
+        }
+        
+        $verifica->bind_param("s", $email);
+        $verifica->execute();
+        $resultado = $verifica->get_result();
+        
+        if ($resultado->num_rows > 0) {
+            $mensagem = 'Este email já está cadastrado!';
+            $tipo_mensagem = 'erro';
+        } else {
+            $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, telefone, senha) VALUES (?, ?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception('Erro ao preparar inserção: ' . $conn->error);
+            }
+            
+            $stmt->bind_param("ssss", $nome, $email, $telefone, $senha_hash);
+            
+            if ($stmt->execute()) {
+                $mensagem = 'Usuário cadastrado com sucesso! Você já pode fazer login.';
+                $tipo_mensagem = 'sucesso';
+            } else {
+                throw new Exception('Erro ao cadastrar: ' . $stmt->error);
+            }
+            
+            $stmt->close();
+        }
+        
+        $verifica->close();
+        $conn->close();
+        
+    } catch (Exception $e) {
+        $mensagem = 'Erro: ' . $e->getMessage();
+        $tipo_mensagem = 'erro';
     }
-    
-    $verifica->close();
-    $conn->close();
 }
 ?>
 <!DOCTYPE html>
@@ -57,6 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li><a href="index.php">Home</a></li>
                     <li><a href="usuarios.php">Usuários</a></li>
                     <li><a href="cadastro.php" class="active">Cadastro</a></li>
+                    <li><a href="nova-publicacao.php">Nova Publicação</a></li>
+                    <!-- Adicionando link de login -->
+                    <li><a href="login.php">Login</a></li>
                 </ul>
             </div>
         </nav>
@@ -88,8 +124,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000">
                 </div>
                 
+                <!-- Adicionando campos de senha -->
+                <div class="form-group">
+                    <label for="senha">Senha* (mínimo 6 caracteres)</label>
+                    <input type="password" id="senha" name="senha" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirma_senha">Confirmar Senha*</label>
+                    <input type="password" id="confirma_senha" name="confirma_senha" required minlength="6">
+                </div>
+                
                 <button type="submit" class="btn btn-primary">Cadastrar</button>
             </form>
+            
+            <!-- Adicionando link para login -->
+            <p style="margin-top: 20px; text-align: center;">
+                Já tem conta? <a href="login.php">Faça login aqui</a>
+            </p>
         </div>
     </main>
 

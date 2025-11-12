@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'config/database.php';
 
 $mensagem = '';
@@ -68,6 +69,12 @@ try {
                     <li><a href="usuarios.php">Usuários</a></li>
                     <li><a href="cadastro.php">Cadastro</a></li>
                     <li><a href="nova-publicacao.php" class="active">Nova Publicação</a></li>
+                    <!-- Adicionando link de login/logout -->
+                    <?php if (isset($_SESSION['usuario_id'])): ?>
+                        <li><a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>)</a></li>
+                    <?php else: ?>
+                        <li><a href="login.php">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </nav>

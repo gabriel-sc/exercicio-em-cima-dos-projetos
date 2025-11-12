@@ -1,10 +1,22 @@
 <?php
+session_start();
 require_once 'config/database.php';
-$conn = conectarBanco();
 
-// Buscar todos os usuários ativos
-$sql = "SELECT * FROM usuarios WHERE ativo = 1 ORDER BY data_cadastro DESC";
-$resultado = $conn->query($sql);
+try {
+    $conn = conectarBanco();
+    verificarTabelas($conn);
+    
+    // Buscar todos os usuários
+    $sql = "SELECT * FROM usuarios ORDER BY data_cadastro DESC";
+    $resultado = $conn->query($sql);
+    
+    if (!$resultado) {
+        throw new Exception("Erro na consulta: " . $conn->error);
+    }
+    
+} catch (Exception $e) {
+    die("❌ Erro: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -23,6 +35,13 @@ $resultado = $conn->query($sql);
                     <li><a href="index.php">Home</a></li>
                     <li><a href="usuarios.php" class="active">Usuários</a></li>
                     <li><a href="cadastro.php">Cadastro</a></li>
+                    <li><a href="nova-publicacao.php">Nova Publicação</a></li>
+                    <!-- Adicionando link de login/logout -->
+                    <?php if (isset($_SESSION['usuario_id'])): ?>
+                        <li><a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>)</a></li>
+                    <?php else: ?>
+                        <li><a href="login.php">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </nav>
@@ -55,7 +74,9 @@ $resultado = $conn->query($sql);
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" style="text-align: center;">Nenhum usuário encontrado</td>
+                            <td colspan="5" style="text-align: center;">
+                                Nenhum usuário encontrado. <a href="cadastro.php">Cadastre o primeiro!</a>
+                            </td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

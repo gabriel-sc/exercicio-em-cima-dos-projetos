@@ -1,14 +1,29 @@
 <?php
+session_start();
 require_once 'config/database.php';
-$conn = conectarBanco();
 
-// Buscar posts publicados
-$sql = "SELECT p.*, u.nome as autor_nome 
-        FROM posts p 
-        LEFT JOIN usuarios u ON p.autor_id = u.id 
-        WHERE p.status = 'publicado' 
-        ORDER BY p.data_publicacao DESC";
-$resultado = $conn->query($sql);
+try {
+    $conn = conectarBanco();
+    
+    // Verificar se as tabelas existem
+    verificarTabelas($conn);
+    
+    // Buscar posts publicados
+    $sql = "SELECT p.*, u.nome as autor_nome 
+            FROM posts p 
+            LEFT JOIN usuarios u ON p.autor_id = u.id 
+            WHERE p.status = 'publicado' 
+            ORDER BY p.data_publicacao DESC";
+    
+    $resultado = $conn->query($sql);
+    
+    if (!$resultado) {
+        throw new Exception("Erro na consulta: " . $conn->error);
+    }
+    
+} catch (Exception $e) {
+    die("❌ Erro: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -27,6 +42,13 @@ $resultado = $conn->query($sql);
                     <li><a href="index.php">Home</a></li>
                     <li><a href="usuarios.php">Usuários</a></li>
                     <li><a href="cadastro.php">Cadastro</a></li>
+                    <li><a href="nova-publicacao.php">Nova Publicação</a></li>
+                    <!-- Adicionando link de login/logout -->
+                    <?php if (isset($_SESSION['usuario_id'])): ?>
+                        <li><a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>)</a></li>
+                    <?php else: ?>
+                        <li><a href="login.php">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </nav>
@@ -36,6 +58,12 @@ $resultado = $conn->query($sql);
         <section class="hero">
             <h2>Bem-vindo ao nosso site!</h2>
             <p>Sistema completo com PHP e MySQL hospedado no InfinityFree</p>
+            <!-- Mostrando status de login -->
+            <?php if (isset($_SESSION['usuario_id'])): ?>
+                <p style="color: #27ae60; font-weight: bold;">
+                    Olá, <?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>!
+                </p>
+            <?php endif; ?>
         </section>
 
         <section class="posts">
@@ -54,7 +82,7 @@ $resultado = $conn->query($sql);
                     </article>
                 <?php endwhile; ?>
             <?php else: ?>
-                <p>Nenhum post encontrado.</p>
+                <p>Nenhum post encontrado. Cadastre alguns posts no banco de dados!</p>
             <?php endif; ?>
         </section>
     </main>
